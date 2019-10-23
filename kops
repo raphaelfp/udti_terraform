@@ -1,0 +1,36 @@
+# Configuração KOPS
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+export AWS_DEFAULT_REGION=us-east-1
+
+export NAME=$(terraform output name)
+export KOPS_STATE_STORE=$(terraform output bucket)
+
+kops edit cluster ${NAME}
+
+kops update cluster \
+  --out=. \
+  --target=terraform \
+  ${NAME}
+
+# Geração da chave SSH
+ssh-keygen -f ~/.ssh/kops_key
+
+# Geração do Terraform do KOPS
+kops create cluster \
+  --name=$(terraform output name) \
+  --state=$(terraform output bucket) \
+  --authorization RBAC \
+  --zones=us-east-1a \
+  --node-count=3 \
+  --node-size=t3.small \
+  --master-size=t3.medium \
+  --master-count=1 \
+  --dns-zone=Z3NZPSNFB1KGIP \
+  --vpc=$(terraform output tf_vpc_id)\
+  --out=. \
+  --target=terraform \
+  --ssh-public-key=~/.ssh/kops_key.pub
+
+# Imagem de teste k8s
+kubectl run -i --tty busybox --rm --image=debian -- sh
