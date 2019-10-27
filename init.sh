@@ -58,7 +58,7 @@ function install_docker() {
 }
 
 function install_nodejs() {
-    if [ -z $(wich npm) ]; then
+    if [ -z $(which npm) ]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
         export NVM_DIR="$HOME/.nvm"
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
